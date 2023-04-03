@@ -8,6 +8,7 @@ import './Login.scss';
 import { FormattedMessage } from 'react-intl';
 import {handleLoginApi} from '../../services/userService';
 
+
 class Login extends Component {
     // KHAI BAO => HAM TAO
     constructor(props) {
@@ -15,8 +16,9 @@ class Login extends Component {
         this.state = {
           username: '',
           password:'',
-        //   SHow-hiden Password
-         isShowPassword : false,
+          //  SHow-hiden Password
+          isShowPassword : false,
+          errMessage: '',
         }
     }
 
@@ -39,12 +41,26 @@ class Login extends Component {
 }
 // TAO HAM handleLogin => LAY GIA TRI TRONG FORM INPUT
 handleLogin = async () => {
-     try {
-        await handleLoginApi (this.state.username, this.state.password);
+    this.setState({
+        errMessage: ''
+    })
+   try {
+        await handleLoginApi (this.state.username, this.state.password); 
+       
     } catch (error) {
-        console.log(error)
+        // HIEN BIEN LOI => LEN MAN HINH LOGIN
+        if (error.response){
+            if (error.response.data){
+                this.setState({
+                    errMessage : error.response.data.message  
+                })
+            }
+        }  
+        console.log ('hoidanit Error: ', error.response)
     }
+    console.log ('hoidanit' )
 }
+
 // SHOW PASSWORD - DISPLAY PASSWORD 
 handleShowHidePassword = () => {
     this.setState({
@@ -91,6 +107,11 @@ handleShowHidePassword = () => {
                             </span>
                                  
                             </div>
+                        </div>
+
+{/* BIEN HIEN THI HAM LOGIN */}
+                        <div className='col-12' style= {{color : 'red'}}>
+                                {this.state.errMessage}
                         </div>
 
                         <div className='col-12 '>
