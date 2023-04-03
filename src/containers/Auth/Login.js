@@ -6,7 +6,8 @@ import * as actions from "../../store/actions";
 
 import './Login.scss';
 import { FormattedMessage } from 'react-intl';
- 
+import {handleLoginApi} from '../../services/userService';
+
 class Login extends Component {
     // KHAI BAO => HAM TAO
     constructor(props) {
@@ -37,9 +38,12 @@ class Login extends Component {
 
 }
 // TAO HAM handleLogin => LAY GIA TRI TRONG FORM INPUT
-handleLogin = () => {
-    alert('UserName : ' + this.state.username + " Password : " + this.state.password);
-
+handleLogin = async () => {
+     try {
+        await handleLoginApi (this.state.username, this.state.password);
+    } catch (error) {
+        console.log(error)
+    }
 }
 // SHOW PASSWORD - DISPLAY PASSWORD 
 handleShowHidePassword = () => {
