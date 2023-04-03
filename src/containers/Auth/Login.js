@@ -5,7 +5,7 @@ import { push } from "connected-react-router";
 import * as actions from "../../store/actions"; 
 
 import './Login.scss';
-import { FormattedMessage } from 'react-intl';
+// import { FormattedMessage } from 'react-intl';
 import {handleLoginApi} from '../../services/userService';
 
 
@@ -45,20 +45,29 @@ handleLogin = async () => {
         errMessage: ''
     })
    try {
-        await handleLoginApi (this.state.username, this.state.password); 
-       
+        let data = await handleLoginApi (this.state.username, this.state.password); 
+        if (data.data && data.data.errCode !== 0 ){
+            this.setState({
+                errMessage: data.data.message
+            })
+        }
+        if (data.data && data.data.errCode === 0){
+            // TODO => HIEN THI THONG BAO DANG NHAP THANH CONG
+           this.props.userLoginSuccess(data.data.user)
+            console.log('LOGIN SUCCEEDS!')
+        } 
+
     } catch (error) {
         // HIEN BIEN LOI => LEN MAN HINH LOGIN
         if (error.response){
             if (error.response.data){
                 this.setState({
-                    errMessage : error.response.data.message  
+                    errMessage : error.response.data.data.message  
                 })
             }
         }  
-        console.log ('hoidanit Error: ', error.response)
-    }
-    console.log ('hoidanit' )
+        console.log ('Error: ', error.response)
+    } 
 }
 
 // SHOW PASSWORD - DISPLAY PASSWORD 
@@ -72,26 +81,26 @@ handleShowHidePassword = () => {
     render() { 
   // => viet theo JSX
         return ( 
-            <div className='login-background'>
-                <div className='login-container'>
-                    <div className='login-content row'>
-                        <div className='col-12 text-login'>LOGIN</div>
-                        <div className='col-12 form-group login-input'>
+            <div className="login-background">
+                <div className="login-container">
+                    <div className="login-content row">
+                        <div className="col-12 text-login">LOGIN</div>
+                        <div className="col-12 form-group login-input">
                             <label>Username: </label>
                             <input  
                             // HIEN THI GIA TRI USER NAME LEN FROM LOGIN
                             value={this.state.username} // MAC DINH TRONG FORM INPUT
                             // TAO HAM => THAY DOI GIA TRI KHI NHAP VAO FORM INPUT
                             onChange={(event) => this.handleOnChangeUsername(event)}
-                            type='text' 
-                            className='form-control' 
-                            placeholder='Enter your username'></input>
+                            type="text"
+                            className="form-control"
+                            placeholder="Enter your username"></input>
                         </div>
 
-                        <div className='col-12 form-group login-input'>
+                        <div className="col-12 form-group login-input">
                             <label>Password: </label>
                             
-                            <div className='custom-input-password'>
+                            <div className="custom-input-password">
 
                             <input  
                               // HIEN THI GIA TRI USER NAME LEN FROM LOGIN
@@ -99,7 +108,7 @@ handleShowHidePassword = () => {
                               // TAO HAM => THAY DOI GIA TRI KHI NHAP VAO FORM INPUT
                               onChange={(event) => this.handleOnChangePassword(event)}
                             //    Check dieu kien => true (text) => false (password)
-                             type={this.state.isShowPassword ? 'text' : 'password'} className='form-control' placeholder='Enter your password'></input>
+                             type={this.state.isShowPassword ? 'text' : 'password'} className="form-control"  placeholder='Enter your password'></input>
                             {/* SHOW PASSWORD - DISPLAY PASSWORD  */}
                             <span onClick={() => { this.handleShowHidePassword()}}>
                                 {/* <i class="fas fa-eye-slash"></i> */}
@@ -110,22 +119,22 @@ handleShowHidePassword = () => {
                         </div>
 
 {/* BIEN HIEN THI HAM LOGIN */}
-                        <div className='col-12' style= {{color : 'red'}}>
+                        <div className="col-12" style= {{color : 'red'}}>
                                 {this.state.errMessage}
                         </div>
 
-                        <div className='col-12 '>
+                        <div className="col-12">
                             {/* TAO HAM handleLogin => LAY GIA TRI TRONG FORM INPUT*/}
-                        <button className='btn-login' onClick={() => {this.handleLogin()}}>Login</button>
+                        <button className="btn-login" onClick={() => {this.handleLogin()}}>Login</button>
                         </div>
-                        <div className='col-12'>
-                            <span className='forgot-password'>Forgot your password</span>
+                        <div className="col-12">
+                            <span className="forgot-password">Forgot your password</span>
                         </div>
-                        <div className='col-12 text-center mt-3'>
-                            <span className='text-other-login'>Or Login With: </span>
+                        <div className="col-12 text-center mt-3">
+                            <span className="text-other-login">Or Login With: </span>
                         </div>
 
-                        <div className='col-12 social-login'>
+                        <div className="col-12 social-login">
                                 <i className="fab fa-google-plus-g google"></i>
                                 <i className="fab fa-facebook-f facebook"></i>
                         </div>
@@ -147,8 +156,9 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
     return {
         navigate: (path) => dispatch(push(path)),
-        adminLoginSuccess: (adminInfo) => dispatch(actions.adminLoginSuccess(adminInfo)),
-        adminLoginFail: () => dispatch(actions.adminLoginFail()),
+        // userLoginFail: () => dispatch(actions.adminLoginFail()),
+        // THONG BAO DA DANG NHAP THANH CONG
+        userLoginSuccess: (userInfor) => dispatch(actions.userLoginSuccess(userInfor))
     };
 };
 
